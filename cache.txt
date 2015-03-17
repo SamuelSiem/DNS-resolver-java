@@ -1,5 +1,5 @@
-google.com 1234
-flksdgjdlsgjk host not found
-facebook.com 1234
-maps.tt 2345
-frak.jon host not found
+name server:maps.com 1234
+name server:google.tt 2345
+address:mail.google.tt 2345
+address:mail.com address not found
+address:www.maps.com 1234

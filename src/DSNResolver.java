@@ -55,10 +55,25 @@ public class DSNResolver {
 	
 	
 	public static boolean findHost(String hostname){
-		if(cacheMap.get(hostname) != null){
-			return true;
-		}
+		if(cacheMap.size() > 0){
+			for (String key : cacheMap.keySet()) {
+			    if(key.contains(hostname)){
+			    	String temp[] = key.split(":");
+			    	return temp[1].startsWith(hostname);
+			    }
+			}
+		}		
 		return false;
+	}
+	
+	public static String getCachedAddress(String hostname){
+		for (String key : cacheMap.keySet()) {
+		    if(key.contains(hostname)){
+		    	String temp[] = key.split(":");
+		    	return "Local DNS:" + key+":"+cacheMap.get(key);
+		    }
+		}
+		return null;
 	}
 	
 	public static String getDomain(String host){
@@ -72,7 +87,7 @@ public class DSNResolver {
 	
 	public static String callServer(String host, int ipAddress) throws Exception {
 		
-		byte[] sendData = (host+","+ipAddress).getBytes();
+		byte[] sendData = (host).getBytes();
 		byte[] receiveData = new byte[1024];
 		String modifiedSentence;
 		InetAddress IPAddress;
@@ -127,7 +142,8 @@ public class DSNResolver {
 			
 			if(findHost(host)){
 				System.out.println("Host found in cache");
-				String response ="Local DNS:"+host+" : "+cacheMap.get(host); //sentence.toUpperCase();
+				
+				String response =getCachedAddress(host);
 
 	            sendData = response.getBytes();
 
@@ -142,7 +158,7 @@ public class DSNResolver {
 				String ip_address = res[1];				
 				cacheMap.put(hostname, ip_address);
 				writeToCache();
-				String response = "Local DNS:"+hostname+" : "+ip_address; //sentence.toUpperCase();
+				String response = "Local DNS: "+hostname+" : "+ip_address; //sentence.toUpperCase();
 				System.out.println(response);
 				sendData = response.getBytes();
 

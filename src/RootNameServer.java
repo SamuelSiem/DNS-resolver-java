@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,8 +23,7 @@ public class RootNameServer{
 		this.domainServers = new ArrayList<CacheRecord>();
 		this.domainServers.add(new CacheRecord(".com", 1234));
 		this.domainServers.add(new CacheRecord(".tt",2345));
-		this.sendData = new byte[1024];
-		this.receiveData = new byte[1024];
+		
 		try{
 			this.clientSocket = new DatagramSocket();
 			this.IPAddress = InetAddress.getByName(localhost);
@@ -53,10 +53,12 @@ public class RootNameServer{
 	}
 
 	
-	public String callServer(int ipAddress) {
+	public String callServer(String hostname, int ipAddress) throws SocketException {
+		this.sendData = new byte[1024];
+		this.receiveData = new byte[1024];
 		
-		this.sendData = (""+ipAddress).getBytes();
-		
+		this.sendData = (""+hostname).getBytes();
+		DatagramSocket clientSocket = new DatagramSocket();	
 		// send packet 
 		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, ipAddress);
 		// packet
@@ -96,7 +98,7 @@ public class RootNameServer{
 
 		
 		System.out.println("Root Name Server started...");
-		String host[];
+		String host;
 		String domain;
 		while(true)
         {
@@ -110,14 +112,14 @@ public class RootNameServer{
 
 			int port = receivePacket.getPort();
 			
-			host = new String(receivePacket.getData()).trim().toLowerCase().split(",");
-			System.out.println("Dns sent "+host[0]);
-			domain = rns.getDomain(host[0]);
+			host = new String(receivePacket.getData()).trim().toLowerCase();
+			System.out.println("Dns sent "+host);
+			domain = rns.getDomain(host);
 			int nameServerAddress = rns.getAddress(domain);
 			
 			if(nameServerAddress !=0){
 				System.out.println("Name Server Found!");
-	        	String response = host[0] + ","+nameServerAddress;
+	        	String response = rns.callServer(host, nameServerAddress);
 
 	            sendData = response.getBytes();
 
@@ -127,7 +129,7 @@ public class RootNameServer{
 			}else{
 				
 				System.out.println("Name Server Not Found!");
-	        	String response = host[0]+",Host Not Found"; //sentence.toUpperCase();
+				String response = "Address:"+host+",Address Not Found"; //sentence.toUpperCase();
 
 	            sendData = response.getBytes();
 
