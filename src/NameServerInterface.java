@@ -1,6 +1,6 @@
 
 public interface NameServerInterface {
 
-	abstract String getAddress(String address);
+	abstract int getAddress(String address);
 	
 }

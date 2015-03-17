@@ -8,7 +8,7 @@ import java.net.InetAddress;
 public class DNSClient {
 	
 	private static final String localhost = "localhost";
-	private static final int serverPort = 9876;
+	private static final int serverPort = 9876;	
 	
 	public static void main(String args[]) throws Exception
    {
