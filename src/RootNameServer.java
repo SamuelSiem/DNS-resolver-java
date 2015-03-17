@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class RootNameServer implements NameServerInterface{
+public class RootNameServer{
 	
 	private static final String localhost = "localhost";
 	private static final int serverPort = 4569;
@@ -42,8 +42,7 @@ public class RootNameServer implements NameServerInterface{
 		return "Host Not found";
 	}
 	
-
-	@Override
+	
 	public int getAddress(String address) {
 		for(CacheRecord c : domainServers){
 			if(c.getHostname().equals(address)){

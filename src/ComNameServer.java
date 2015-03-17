@@ -1,7 +1,7 @@
 
-public class ComNameServer implements NameServerInterface{
+public class ComNameServer{
 
-	@Override
+	
 	public int getAddress(String address) {
 		// TODO Auto-generated method stub
 		return 0;
