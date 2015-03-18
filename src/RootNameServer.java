@@ -1,3 +1,14 @@
+/**
+ * 	Name:	Nicholas Chamansingh
+ * 	ID:		8090022423
+ * 	Course:	Comp6601
+ * 
+ * 
+ * 				Assignment 2
+ */
+
+
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -21,8 +32,8 @@ public class RootNameServer{
 	
 	public RootNameServer(){
 		this.domainServers = new ArrayList<CacheRecord>();
-		this.domainServers.add(new CacheRecord(".com", 1234));
-		this.domainServers.add(new CacheRecord(".tt",2345));
+		this.domainServers.add(new CacheRecord(".com", 9999));
+		this.domainServers.add(new CacheRecord(".tt",8888));
 		
 		try{
 			this.clientSocket = new DatagramSocket();
@@ -52,43 +63,6 @@ public class RootNameServer{
 		return 0;
 	}
 
-	
-	public String callServer(String hostname, int ipAddress) throws SocketException {
-		this.sendData = new byte[1024];
-		this.receiveData = new byte[1024];
-		
-		this.sendData = (""+hostname).getBytes();
-		DatagramSocket clientSocket = new DatagramSocket();	
-		// send packet 
-		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, ipAddress);
-		// packet
-		try {
-			clientSocket.send(sendPacket);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		System.out.println("Data sent...");
-		
-	
-		// received packet
-		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-		System.out.println("Data received from server");
-		try {
-			clientSocket.receive(receivePacket);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-		String modifiedSentence = new String(receivePacket.getData());
-
-		System.out.println("FROM SERVER:" + modifiedSentence);
-		clientSocket.close();
-		System.out.println("Connection closed");
-		
-		return modifiedSentence;
-	}
 
 	public static void main(String args[]) throws Exception
     {
@@ -119,7 +93,7 @@ public class RootNameServer{
 			
 			if(nameServerAddress !=0){
 				System.out.println("Name Server Found!");
-	        	String response = rns.callServer(host, nameServerAddress);
+				String response = "Name Server:"+host + ","+nameServerAddress;	        	
 
 	            sendData = response.getBytes();
 
@@ -129,7 +103,7 @@ public class RootNameServer{
 			}else{
 				
 				System.out.println("Name Server Not Found!");
-				String response = "Address:"+host+",Address Not Found"; //sentence.toUpperCase();
+				String response = "Name Server:"+host+",Address Not Found"; //sentence.toUpperCase();
 
 	            sendData = response.getBytes();
 

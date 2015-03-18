@@ -9,49 +9,61 @@
 
 
 
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.List;
 
 
-public class ComNameServer{
-
+public class ComServer{
+	
 	private static final String localhost = "localhost";
-	private static final int serverPort = 1234;
-	private List<String> hostnames;
-	private static final String nameServer  = "google.com";
+	private static final int serverPort = 9999;
+	private List<CacheRecord> domainServers;
 	
-	public ComNameServer(){
-		this.hostnames = new ArrayList<String>();
-		this.hostnames.add("console.google.com");
-		this.hostnames.add("maps.google.com");
-		this.hostnames.add("drive.google.com");
-		this.hostnames.add("mail.google.com");
-		this.hostnames.add("calendar.google.com");
+	private DatagramSocket clientSocket;
+	private InetAddress IPAddress; 
+	byte[] sendData;
+	byte[] receiveData;
+	
+	
+	public ComServer(){
+		this.domainServers = new ArrayList<CacheRecord>();
+		this.domainServers.add(new CacheRecord("google.com", 1234));		
+		
+		try{
+			this.clientSocket = new DatagramSocket();
+			this.IPAddress = InetAddress.getByName(localhost);
+		}catch(Exception e){
+			System.out.println(e.getMessage());
+		}
+		
 	}
-	public boolean getAddress(String address) {
-		
-		if(this.hostnames.contains(address)){
-			return true;
-		}		
-		
-		return false;
+	
+	
+	public int getAddress(String address) {
+		for(CacheRecord c : domainServers){
+			if(address.contains(c.getHostname())){
+				return c.getIpAddress();
+			}
+		}
+		return 0;
 	}
+
+
+	public static void main(String args[]) throws Exception
+    {
 	
-	
-	
-	
-	public static void main(String args[]) throws IOException{
-		
-		ComNameServer comns = new ComNameServer();
+		ComServer cns = new ComServer();
 		DatagramSocket serverSocket = new DatagramSocket(serverPort);
 
 		
-		System.out.println("Com Name Server started...");
-		String host;
+		System.out.println(".com Server started...");
+		String host;		
 		while(true)
         {
 			byte[] receiveData = new byte[1024];
@@ -66,38 +78,34 @@ public class ComNameServer{
 			
 			host = new String(receivePacket.getData()).trim().toLowerCase();
 			System.out.println("Data received:  "+host);
+
+			int nameServerAddress = cns.getAddress(host);
 			
-			
-			
-			if(comns.getAddress(host) || host.equals(nameServer)){
-				System.out.println("Address Found!");
-				String response = "";
-				response = "Address:"+host + ","+serverPort;				
+			if(nameServerAddress !=0){
+				System.out.println("Name Server Found!");
+	        	String response = "Name Server:"+host + ","+nameServerAddress;
 
 	            sendData = response.getBytes();
 
 	            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
 
 	            serverSocket.send(sendPacket);
-	            System.out.println(response+" sent...");
 			}else{
 				
-				System.out.println("Address Not Found!");
-	        	String response = "Address:"+host+",Address Not Found"; //sentence.toUpperCase();
+				System.out.println("Name Server Not Found!");
+				String response = "Name Server:"+host+":Address Not Found,"+serverPort; //sentence.toUpperCase();
 
 	            sendData = response.getBytes();
 
 	            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
 
 	            serverSocket.send(sendPacket);
-	            System.out.println(response+" sent...");
 			}
 			
 
         }
-		
-		
-	}
+    }
 
-
+	
+	
 }

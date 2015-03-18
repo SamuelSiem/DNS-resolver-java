@@ -1,3 +1,14 @@
+/**
+ * 	Name:	Nicholas Chamansingh
+ * 	ID:		8090022423
+ * 	Course:	Comp6601
+ * 
+ * 
+ * 				Assignment 2
+ */
+
+
+
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -11,12 +22,14 @@ public class TTNameServer{
 	private static final String localhost = "localhost";
 	private static final int serverPort = 2345;
 	private List<String> hostnames;
-	private static final String nameServer  = "google.tt";
+	private static final String nameServer  = "igov.tt";
 	
 	public TTNameServer(){
 		this.hostnames = new ArrayList<String>();
-		this.hostnames.add("mail.google.tt");
-		this.hostnames.add("www.google.tt");
+		this.hostnames.add("mail.igov.tt");
+		this.hostnames.add("www.igov.tt");
+		this.hostnames.add("odpm.igov.tt");
+		this.hostnames.add("co.igov.tt");
 	}
 	public boolean getAddress(String address) {
 		
@@ -45,24 +58,21 @@ public class TTNameServer{
 			DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
 
 			serverSocket.receive(receivePacket);
-			System.out.println("Request received from RNS");
+			System.out.println("Request received from");
 			InetAddress IPAddress = receivePacket.getAddress();
 
 			int port = receivePacket.getPort();
 			
 			host = new String(receivePacket.getData()).trim().toLowerCase();
-			System.out.println("RNS sent "+host);
+			System.out.println("Data received:  "+host);
 			
 			
 			
 			if(ttns.getAddress(host) || host.equals(nameServer)){
 				System.out.println("Address Found!");
 				String response = "";
-				if(host.equals(nameServer)){
-					response = "Name Server:"+host + ","+serverPort;
-				}else{
-					response = "Address:"+host + ","+serverPort;
-				}
+				
+				response = "Address:"+host + ","+serverPort;			
 
 	            sendData = response.getBytes();
 

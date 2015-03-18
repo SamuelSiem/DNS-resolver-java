@@ -1,3 +1,13 @@
+/**
+ * 	Name:	Nicholas Chamansingh
+ * 	ID:		8090022423
+ * 	Course:	Comp6601
+ * 
+ * 
+ * 				Assignment 2
+ */
+
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.DatagramPacket;

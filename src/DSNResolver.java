@@ -1,3 +1,15 @@
+/**
+ * 	Name:	Nicholas Chamansingh
+ * 	ID:		8090022423
+ * 	Course:	Comp6601
+ * 
+ * 
+ * 				Assignment 2
+ */
+
+
+
+
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -55,22 +67,23 @@ public class DSNResolver {
 	
 	
 	public static boolean findHost(String hostname){
+		boolean found = false;
 		if(cacheMap.size() > 0){
 			for (String key : cacheMap.keySet()) {
 			    if(key.contains(hostname)){
-			    	String temp[] = key.split(":");
-			    	return temp[1].startsWith(hostname);
+			    	found = true;
 			    }
 			}
+			return found;
 		}		
-		return false;
+		return found;
 	}
 	
 	public static String getCachedAddress(String hostname){
 		for (String key : cacheMap.keySet()) {
-		    if(key.contains(hostname)){
-		    	String temp[] = key.split(":");
-		    	return "Local DNS:" + key+":"+cacheMap.get(key);
+		    if(key.equals(hostname)){
+		    	System.out.println(cacheMap.get(key));
+		    	return "Local DNS: "+hostname+" : "+ cacheMap.get(key);
 		    }
 		}
 		return null;
@@ -97,18 +110,18 @@ public class DSNResolver {
 		// send packet 
 		DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, ipAddress);
 		clientSocket.send(sendPacket);
-		System.out.println("Data sent to "+ipAddress);
+		System.out.println("Data sent");
 		
 		// received packet
 		DatagramPacket receivePacket = new DatagramPacket(receiveData, receiveData.length);
-		System.out.println("Data received from "+ipAddress);
+		System.out.println("Data received");
 		clientSocket.receive(receivePacket);
 		
 		modifiedSentence = new String(receivePacket.getData());
 
-		System.out.println("FROM SERVER:" + modifiedSentence);
+		System.out.println("FROM SERVER: " + modifiedSentence);
 		clientSocket.close();
-		System.out.println("Connection closed");
+		
 		
 		return modifiedSentence;
 	}
@@ -139,8 +152,23 @@ public class DSNResolver {
 			host = new String(receivePacket.getData()).trim().toLowerCase();			
 			System.out.println("Clent sent "+host);
 			System.out.println("Searching cache...");
-			
-			if(findHost(host)){
+			int i;
+			boolean isValid = true;
+			for(i=0; i<host.length(); i++){
+				if(host.charAt(i) != '.' && !Character.isAlphabetic(host.charAt(i))){
+					isValid = false;
+				}
+			}
+			if(!isValid){
+				String response = "Invalid Format"; //sentence.toUpperCase();
+				System.out.println(response);
+				sendData = response.getBytes();
+
+	            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
+
+	            serverSocket.send(sendPacket);
+			}
+			else if(findHost(host)){
 				System.out.println("Host found in cache");
 				
 				String response =getCachedAddress(host);
@@ -151,15 +179,20 @@ public class DSNResolver {
 
 	            serverSocket.send(sendPacket);
 			}else{
-				System.out.println("Host not in cache, calling root name server...");				
+				System.out.println("Host not in cache, performing iterative search...");				
 
 				String res[] = callServer(host,rootNameServerPort).trim().toLowerCase().split(",");
-				String hostname = res[0];
+				
+				while(!res[0].toLowerCase().contains("address")){
+					System.out.println("\n");
+					res = callServer(host,Integer.parseInt(res[1])).trim().toLowerCase().split(",");					
+				}
+				String hostname = res[0].split(":")[1];
 				String ip_address = res[1];				
 				cacheMap.put(hostname, ip_address);
 				writeToCache();
 				String response = "Local DNS: "+hostname+" : "+ip_address; //sentence.toUpperCase();
-				System.out.println(response);
+				System.out.println(res[0] + " : "+res[1]);
 				sendData = response.getBytes();
 
 	            DatagramPacket sendPacket = new DatagramPacket(sendData, sendData.length, IPAddress, port);
