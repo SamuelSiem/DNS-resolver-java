@@ -23,7 +23,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 
-public class DSNResolver {
+public class DNSResolver {
 	
 	private final static int serverPort = 9876;
 	private final static int rootNameServerPort = 4569;
